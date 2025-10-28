@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: info_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d info_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping || rabbitmqctl await_startup || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://user:password@postgres:5432/info_db
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    depends_on:
+      - postgres
+      - rabbitmq
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/vehicles || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    ports:
+      - '3000:3000'
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      DATABASE_URL: postgres://user:password@postgres:5432/info_db
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    depends_on:
+      - postgres
+      - rabbitmq
+    restart: unless-stopped
+
+volumes:
+  pgdata:

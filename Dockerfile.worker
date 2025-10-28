@@ -1,5 +1,5 @@
 FROM node:22-alpine
-WORKDIR /usr/src/app
+WORKDIR /usr/src/worker
 COPY package*.json ./
 
 RUN npm ci
@@ -9,8 +9,6 @@ RUN npm run prisma:generate
 RUN npm run build
 
 RUN npm prune --production
-
-EXPOSE 3000
 COPY scripts/wait-for.js ./scripts/wait-for.js
 RUN chmod +x ./scripts/wait-for.js || true
-CMD ["sh", "-c", "node ./scripts/wait-for.js postgres 5432 60 1000 && node ./scripts/wait-for.js rabbitmq 5672 60 1000 && node dist/main.js"]
+CMD ["sh", "-c", "node ./scripts/wait-for.js postgres 5432 60 1000 && node ./scripts/wait-for.js rabbitmq 5672 60 1000 && node dist/worker/worker.js"]
