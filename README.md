@@ -71,7 +71,7 @@ npm run prisma:generate
 # Execute as migrações
 npm run prisma:migrate
 
-# (Opcional) Popule o banco com dados de exemplo
+# (Opcional) Popule o banco com dados de exemplo (20 veículos)
 npm run seed
 ```
 
@@ -156,8 +156,10 @@ curl -X POST http://localhost:3000/api/vehicles \
 
 ## 🧪 Testes
 
+### Testes Unitários
+
 ```bash
-# Executar todos os testes
+# Executar todos os testes unitários
 npm test
 
 # Testes em modo watch
@@ -166,6 +168,41 @@ npm run test:watch
 # Cobertura de testes
 npm run test:cov
 ```
+
+**Cobertura**: 44 testes unitários cobrindo controller, service e DTOs.
+
+📄 Veja [TESTS.md](./TESTS.md) para detalhes completos.
+
+### Testes E2E (End-to-End)
+
+```bash
+# Executar testes e2e
+npm run test:e2e
+
+# Testes e2e em modo watch
+npm run test:e2e:watch
+
+# Usar script auxiliar (verifica serviços)
+./test/run-e2e.sh
+```
+
+**Pré-requisitos para E2E:**
+
+- PostgreSQL rodando: `docker compose up -d postgres`
+- RabbitMQ rodando: `docker compose up -d rabbitmq`
+- API rodando: `npm start`
+
+**Cobertura**: 25 testes e2e validando integração com banco e RabbitMQ.
+
+📄 Veja [test/README-E2E.md](./test/README-E2E.md) para detalhes completos.
+
+### Resumo de Testes
+
+| Tipo          | Quantidade | Cobertura                 |
+| ------------- | ---------- | ------------------------- |
+| **Unitários** | 44         | Controller, Service, DTOs |
+| **E2E**       | 25         | PostgreSQL, RabbitMQ, API |
+| **Total**     | **69**     | Sistema completo          |
 
 ## 🗄️ Banco de Dados
 

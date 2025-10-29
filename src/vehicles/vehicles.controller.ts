@@ -21,7 +21,8 @@ import {
   ApiConflictResponse,
   ApiNoContentResponse,
 } from "@nestjs/swagger";
-import { Request, Response } from "express";
+import { ValidationPipe } from "@nestjs/common";
+import type { Request, Response } from "express";
 import { VehiclesService } from "./vehicles.service";
 import { CreateVehicleDto } from "./dto/create-vehicle.dto";
 import { UpdateVehicleDto } from "./dto/update-vehicle.dto";
